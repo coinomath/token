@@ -15,8 +15,8 @@ contract BNToken is StandardToken, SafeMath {
     uint256 public endBlock;
 
     bool public isFinalized;    // if the crowdsale is finished.
-    uint256 public etherCap = 100000 * 10**decimals;
-    uint256 public tokenCap = 200 * 10**6;
+    uint256 public etherCap = 100000 * 10**decimals;    // the most ether for crowdsale
+    uint256 public tokenCap = 2 * 10**8;
     
     event Allocation(address indexed investor, uint256 value);
 
@@ -31,9 +31,15 @@ contract BNToken is StandardToken, SafeMath {
         startBlock = _startBlock;
         endBlock = _endBlock;
 
-        isFinalized = false;
+        isFinalized = false;    // default to false
+        totalSupply = 15 * 10**6;
+        balances[founder] = totalSupply;
+        Allocation(founder, totalSupply);
     }
 
+    /**
+     * crowdsale
+     */
     function crowdsale() payable external {
         if (isFinalized) throw;
         if (block.number < startBlock || block.number > endBlock) throw;
@@ -48,9 +54,17 @@ contract BNToken is StandardToken, SafeMath {
         Allocation(msg.sender, tokens);
     }
 
+    /**
+     * rate
+     * get rate on realtime
+     */
     function rate() constant returns(uint256) {
-        if (block.number < startBlock + 250) return 3000;    // early bird
-        return 2000 + 800 * (endBlock - block.number) / (endBlock - startBlock + 1);
+        if (block.number < startBlock + 250) return 3300;    // early bird
+        if (block.number < startBlock + 420000) return 3000;
+        if (block.number < startBlock + 840000) return 2750;
+        if (block.number < startBlock + 1260000) return 2500;
+        if (block.number <= endBlock) return 2250; 
+        throw;
     }
 
 }
