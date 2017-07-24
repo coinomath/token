@@ -1,4 +1,4 @@
-# BNT (Bitniex Token)
+# BNS (Bitniex Shares)
 
 An ethereum ERC20 standard token for bitniex.org
 
